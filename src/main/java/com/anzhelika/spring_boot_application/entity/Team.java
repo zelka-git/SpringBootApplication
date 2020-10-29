@@ -1,7 +1,8 @@
 package com.anzhelika.spring_boot_application.entity;
 
-import com.anzhelika.spring_boot_application.dto.MemberDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -10,6 +11,8 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = " team")
+@ToString(exclude = {"members"})
+@EqualsAndHashCode(exclude = {"members"})
 public class Team {
     @Id
     @GeneratedValue
@@ -17,5 +20,5 @@ public class Team {
     String name;
     String city;
     @OneToMany
-    Set<MemberDTO> members;
+    Set<Member> members;
 }
