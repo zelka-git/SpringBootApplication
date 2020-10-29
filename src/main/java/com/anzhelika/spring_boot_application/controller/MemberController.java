@@ -1,6 +1,7 @@
 package com.anzhelika.spring_boot_application.controller;
 
 import com.anzhelika.spring_boot_application.dto.MemberDTO;
+import com.anzhelika.spring_boot_application.service.MemberService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,9 +11,15 @@ import java.util.UUID;
 @RequestMapping("/members")
 public class MemberController {
 
+    private final MemberService memberService;
+
+    public MemberController(MemberService memberService){
+        this.memberService = memberService;
+    }
+
     @GetMapping
-    public List<String> getAll() {
-        return List.of("member1", "member2");
+    public List<MemberDTO> getAll() {
+        return memberService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -20,8 +27,8 @@ public class MemberController {
         return "oops";
     }
 
-    @GetMapping
-    public List<String> getMemberByName(@RequestParam("name") String name) {
+    @GetMapping("/search")
+    public List<String> getMemberByName(@RequestParam(required = true) String name) {
         return null;
     }
 
