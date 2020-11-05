@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,12 +21,13 @@ public class MemberService implements CommonService<MemberDTO, UUID> {
     private final MemberRepository memberRepository;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, ModelMapper modelMapper){
+    public MemberService(MemberRepository memberRepository, ModelMapper modelMapper) {
         this.memberRepository = memberRepository;
         this.modelMapper = modelMapper;
     }
 
     @Override
+    @Transactional
     public List<MemberDTO> findAll() {
         return memberRepository.findAll().stream()
                 .map(member -> modelMapper.map(member, MemberDTO.class))
