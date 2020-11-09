@@ -10,7 +10,7 @@ public interface CommonService<T, Id> {
 
     List<T> findByName(String name);
 
-    Optional<T> update(Id id);
+    T update(T t);
 
-    boolean deleteById(Id id);
+    void deleteById(Id id);
 }

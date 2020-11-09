@@ -1,6 +1,7 @@
 package com.anzhelika.spring_boot_application.service;
 
 import com.anzhelika.spring_boot_application.dto.MemberDTO;
+import com.anzhelika.spring_boot_application.entity.Member;
 import com.anzhelika.spring_boot_application.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -36,21 +37,24 @@ public class MemberService implements CommonService<MemberDTO, UUID> {
 
     @Override
     public Optional<MemberDTO> findById(UUID uuid) {
-        return Optional.empty();
+        return Optional.ofNullable(
+                modelMapper.map(memberRepository.findById(uuid), MemberDTO.class));
     }
 
     @Override
     public List<MemberDTO> findByName(String name) {
-        return null;
+        return memberRepository.findByNameOrderBySurnameAsc(name).stream()
+                .map(member -> modelMapper.map(member, MemberDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public MemberDTO update(MemberDTO member) {
+        Member map = modelMapper.map(member, Member.class);
+        return modelMapper.map(memberRepository.save(map), MemberDTO.class);
     }
 
     @Override
-    public Optional<MemberDTO> update(UUID uuid) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean deleteById(UUID uuid) {
-        return false;
+    public void deleteById(UUID uuid) {
+        memberRepository.deleteById(uuid);
     }
 }
