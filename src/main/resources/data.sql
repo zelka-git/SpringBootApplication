@@ -25,3 +25,12 @@ INSERT INTO member(id, name, surname, birthday, team_id) VALUES
     ('ad6473e6-ee34-4ff4-aef4-96cd834a62a7','Lev', 'Okynev',  '2003-03-10', 'bd0bc2e9-788c-47b2-911a-6871127442a3'),
     ('ec2e2fda-819a-4042-a38d-9b829d6b3353','Kirill', 'Andreev',  '2001-02-11', 'bd0bc2e9-788c-47b2-911a-6871127442a3'),
     ('d003c424-a5fb-4bb9-88a7-2f7142f3b15f','Anton', 'Evdokimov',  '2000-01-13', 'bd0bc2e9-788c-47b2-911a-6871127442a3');
+
+
+
+
+    INSERT INTO member(id, name, surname, birthday, team_id) VALUES
+        ('9a83cc44-b7c7-489e-bf3b-70ea6eb88842','Igor', 'Ovv',  '1996-12-31', '4b585a4d-8b76-4d3f-8cc3-efc6050e8879'),
+        ('4f09416c-615c-4ab7-966d-5fea1f36336f','Igor', 'Tkimov',  '2004-11-21', '4b585a4d-8b76-4d3f-8cc3-efc6050e8879'),
+        ('dea1cbe6-237f-46b4-9718-52484befafeb','Egor', 'Prov',  '1997-11-11', '4b585a4d-8b76-4d3f-8cc3-efc6050e8879'),
+        ('64145c44-5397-43dd-892b-b3655ab73a4c','Migel', 'Ledev',  '2003-11-17', '4b585a4d-8b76-4d3f-8cc3-efc6050e8879');

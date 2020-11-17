@@ -36,9 +36,8 @@ public class MemberService implements CommonService<MemberDTO, UUID> {
     }
 
     @Override
-    public Optional<MemberDTO> findById(UUID uuid) {
-        return Optional.ofNullable(
-                modelMapper.map(memberRepository.findById(uuid), MemberDTO.class));
+    public MemberDTO findById(UUID uuid) {
+        return modelMapper.map(memberRepository.findById(uuid).orElse(new Member()), MemberDTO.class);
     }
 
     @Override
