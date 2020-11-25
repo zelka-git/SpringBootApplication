@@ -2,7 +2,6 @@ package com.anzhelika.spring_boot_application.controller;
 
 import com.anzhelika.spring_boot_application.dto.MemberDTO;
 import com.anzhelika.spring_boot_application.service.MemberService;
-
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.DeleteMapping;

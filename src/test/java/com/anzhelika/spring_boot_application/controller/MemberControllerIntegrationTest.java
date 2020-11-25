@@ -65,7 +65,7 @@ class MemberControllerIntegrationTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         List<Member> members = objectMapper.readValue(contentAsString,
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
-        Assert.assertEquals(members.size(), 24);
+        Assert.assertEquals(24, members.size());
     }
 
     @Test

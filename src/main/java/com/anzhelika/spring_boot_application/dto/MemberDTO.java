@@ -1,11 +1,10 @@
 package com.anzhelika.spring_boot_application.dto;
 
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.time.LocalDate;
-import java.util.UUID;
 import lombok.experimental.Accessors;
 
 @Data

@@ -1,12 +1,11 @@
 package com.anzhelika.spring_boot_application.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @ToString(exclude = {"members"})
