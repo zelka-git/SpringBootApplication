@@ -11,6 +11,12 @@ spring:
   h2:
     console:
       enable: true
+  codec:
+    max-in-memory-size: 2097152
+
+  mvc:
+    async:
+      request-timeout: 3600000
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -20,3 +26,6 @@ spring:
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.H2Dialect
+
+salary-server:
+  url: http://localhost:8084

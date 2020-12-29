@@ -3,13 +3,17 @@ package com.anzhelika.spring_boot_application.controller;
 
 import com.anzhelika.spring_boot_application.SpringBootApplication;
 import com.anzhelika.spring_boot_application.dto.MemberDTO;
+import com.anzhelika.spring_boot_application.dto.MemberSalaryDTO;
+import com.anzhelika.spring_boot_application.dto.MembersSalaryDTO;
 import com.anzhelika.spring_boot_application.entity.Member;
+import com.anzhelika.spring_boot_application.service.SalaryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Assert;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -23,28 +27,34 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootApplication.class)
 @AutoConfigureMockMvc
-@TestPropertySource(
-        locations = "classpath:application-integrationtest.yml")
+@TestPropertySource(locations = "classpath:application-integrationtest.yml")
 class MemberControllerIntegrationTest {
 
-    public static final String MEMBERS_ENDPOINT = "/members";
-    @Autowired
-    public MockMvc mockMvc;
+    static final String MEMBERS_ENDPOINT = "/members";
 
     @Autowired
-    public ObjectMapper objectMapper;
+    MockMvc mockMvc;
 
-    private static MemberDTO validMember;
-    private static MemberDTO validMemberForUpdate;
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    SalaryService salaryService;
+
+    static MemberDTO validMember;
+    static MemberDTO validMemberForUpdate;
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         validMember = new MemberDTO()
                 .setId(UUID.fromString("9dea8838-ae07-4e98-ac8f-947fdeaabaa0"))
                 .setName("Andrey")
@@ -65,7 +75,7 @@ class MemberControllerIntegrationTest {
         String contentAsString = mvcResult.getResponse().getContentAsString();
         List<Member> members = objectMapper.readValue(contentAsString,
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
-        Assert.assertEquals(24, members.size());
+        assertEquals(24, members.size());
     }
 
     @Test
@@ -73,7 +83,7 @@ class MemberControllerIntegrationTest {
         MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/" + validMember.getId().toString()))
                 .andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
-        Assert.assertEquals(validMember, member);
+        assertEquals(validMember, member);
     }
 
     @Test
@@ -81,7 +91,7 @@ class MemberControllerIntegrationTest {
         MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/" + UUID.randomUUID()))
                 .andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
-        Assert.assertEquals(new MemberDTO(), member);
+        assertEquals(new MemberDTO(), member);
     }
 
     @Test
@@ -90,7 +100,7 @@ class MemberControllerIntegrationTest {
                 .andReturn();
         List<MemberDTO> members = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
-        Assert.assertEquals(validMember, members.get(0));
+        assertEquals(validMember, members.get(0));
     }
 
     @Test
@@ -99,7 +109,7 @@ class MemberControllerIntegrationTest {
                 .andReturn();
         List<MemberDTO> members = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
-        Assert.assertEquals(new ArrayList<MemberDTO>(), members);
+        assertEquals(new ArrayList<MemberDTO>(), members);
     }
 
     @Test
@@ -111,7 +121,7 @@ class MemberControllerIntegrationTest {
                         "\"birthday\":\"2001-06-11\"}"))
                 .andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
-        Assert.assertEquals(validMemberForUpdate.setName("Igor").setBirthday(LocalDate.of(2001, 6, 11)), member);
+        assertEquals(validMemberForUpdate.setName("Igor").setBirthday(LocalDate.of(2001, 6, 11)), member);
     }
 
     @Test
@@ -123,6 +133,32 @@ class MemberControllerIntegrationTest {
                         "\"birthday\":\"1989-02-11\"}"))
                 .andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
-        Assert.assertNotNull(member);
+        assertNotNull(member);
+    }
+
+    @Test
+    void getMembersSalaryByIds() throws Exception {
+        MockWebServer mockBackEnd = new MockWebServer();
+        mockBackEnd.start();
+        String baseUrl = String.format("http://localhost:%s", mockBackEnd.getPort());
+        setField(salaryService, "url", baseUrl);
+
+        MemberSalaryDTO memberSalary = MemberSalaryDTO.builder()
+                .id(UUID.randomUUID())
+                .salary(50000)
+                .build();
+        MembersSalaryDTO membersSalaryDTO = new MembersSalaryDTO(List.of(memberSalary));
+
+        mockBackEnd.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(objectMapper.writeValueAsString(membersSalaryDTO))
+                .addHeader("Content-Type", "application/json"));
+
+        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/salary/" + memberSalary.getId()))
+                .andReturn();
+        MembersSalaryDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MembersSalaryDTO.class);
+        assertEquals(membersSalaryDTO, member);
+
+        mockBackEnd.shutdown();
     }
 }
