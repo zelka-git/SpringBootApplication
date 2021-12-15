@@ -29,3 +29,10 @@ spring:
 
 salary-server:
   url: http://localhost:8084
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui/api-docs.html
+  model-converters:
+    pageable-converter:
+      enabled: true

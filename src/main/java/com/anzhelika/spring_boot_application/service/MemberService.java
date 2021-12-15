@@ -10,6 +10,8 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,10 +29,9 @@ public class MemberService implements CommonService<MemberDTO, UUID> {
 
     @Override
     @Transactional
-    public List<MemberDTO> findAll() {
-        return memberRepository.findAll().stream()
-                .map(member -> modelMapper.map(member, MemberDTO.class))
-                .collect(Collectors.toList());
+    public Page<MemberDTO> findAll(Pageable pageable) {
+        return memberRepository.findAll(pageable)
+                .map(member -> modelMapper.map(member, MemberDTO.class));
     }
 
     @Override

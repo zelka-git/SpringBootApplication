@@ -29,10 +29,10 @@ dependencies {
     implementation 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.modelmapper:modelmapper:2.3.8'
-    implementation 'io.springfox:springfox-swagger2:3.0.0'
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
     implementation 'org.hibernate:hibernate-core:5.4.23.Final'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.5.12'
+    implementation 'org.springdoc:springdoc-openapi-data-rest:1.5.12'
+
 
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
@@ -51,4 +51,8 @@ test {
 
 wrapper {
     gradleVersion = '7.3'
+}
+
+springBoot {
+    buildInfo()
 }

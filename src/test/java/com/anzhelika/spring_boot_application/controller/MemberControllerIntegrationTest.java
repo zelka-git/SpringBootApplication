@@ -5,9 +5,9 @@ import com.anzhelika.spring_boot_application.SpringBootApplication;
 import com.anzhelika.spring_boot_application.dto.MemberDTO;
 import com.anzhelika.spring_boot_application.dto.MemberSalaryDTO;
 import com.anzhelika.spring_boot_application.dto.MembersSalaryDTO;
-import com.anzhelika.spring_boot_application.entity.Member;
 import com.anzhelika.spring_boot_application.service.SalaryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.modelmapper.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -70,12 +72,9 @@ class MemberControllerIntegrationTest {
     @Test
     @Order(1)
     void getAll() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT))
-                .andReturn();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        List<Member> members = objectMapper.readValue(contentAsString,
-                objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
-        assertEquals(24, members.size());
+        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT)).andReturn();
+        int totalElements = JsonPath.parse(mvcResult.getResponse().getContentAsString()).read("totalElements");
+        assertEquals(24, totalElements);
     }
 
     @Test
@@ -88,16 +87,14 @@ class MemberControllerIntegrationTest {
 
     @Test
     void getNotExistingMemberById() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/" + UUID.randomUUID()))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/" + UUID.randomUUID())).andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
         assertEquals(new MemberDTO(), member);
     }
 
     @Test
     void getExistingMemberByName() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/search?name=Andrey"))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/search?name=Andrey")).andReturn();
         List<MemberDTO> members = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
         assertEquals(validMember, members.get(0));
@@ -105,8 +102,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     void getNotExistingMemberByName() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/search?name=Joshya"))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/search?name=Joshya")).andReturn();
         List<MemberDTO> members = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory().constructCollectionType(List.class, MemberDTO.class));
         assertEquals(new ArrayList<MemberDTO>(), members);
@@ -115,22 +111,19 @@ class MemberControllerIntegrationTest {
     @Test
     void updateExistingMemberData() throws Exception {
         MvcResult mvcResult = mockMvc.perform(put(MEMBERS_ENDPOINT).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":\"ec2e2fda-819a-4042-a38d-9b829d6b3353\"," +
-                        "\"name\":\"Igor\"," +
-                        "\"surname\":\"Andreev\"," +
-                        "\"birthday\":\"2001-06-11\"}"))
-                .andReturn();
+                .content("{\"id\":\"ec2e2fda-819a-4042-a38d-9b829d6b3353\"," + "\"name\":\"Igor\"," +
+                        "\"surname\":\"Andreev\"," + "\"birthday\":\"2001-06-11\"}")).andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
-        assertEquals(validMemberForUpdate.setName("Igor").setBirthday(LocalDate.of(2001, 6, 11)), member);
+        assertEquals(validMemberForUpdate
+                .setName("Igor")
+                .setBirthday(LocalDate.of(2001, 6, 11)), member);
     }
 
     @Test
     @Order(2)
     void saveMember() throws Exception {
         MvcResult mvcResult = mockMvc.perform(put(MEMBERS_ENDPOINT).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"Garry\"," +
-                        "\"surname\":\"Potter\"," +
-                        "\"birthday\":\"1989-02-11\"}"))
+                        .content("{\"name\":\"Garry\"," + "\"surname\":\"Potter\"," + "\"birthday\":\"1989-02-11\"}"))
                 .andReturn();
         MemberDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MemberDTO.class);
         assertNotNull(member);
@@ -143,20 +136,17 @@ class MemberControllerIntegrationTest {
         String baseUrl = String.format("http://localhost:%s", mockBackEnd.getPort());
         setField(salaryService, "url", baseUrl);
 
-        MemberSalaryDTO memberSalary = MemberSalaryDTO.builder()
-                .id(UUID.randomUUID())
-                .salary(50000)
-                .build();
+        MemberSalaryDTO memberSalary = MemberSalaryDTO.builder().id(UUID.randomUUID()).salary(50000).build();
         MembersSalaryDTO membersSalaryDTO = new MembersSalaryDTO(List.of(memberSalary));
 
-        mockBackEnd.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody(objectMapper.writeValueAsString(membersSalaryDTO))
+        mockBackEnd.enqueue(new MockResponse().setResponseCode(200).setBody(
+                        objectMapper.writeValueAsString(membersSalaryDTO))
                 .addHeader("Content-Type", "application/json"));
 
-        MvcResult mvcResult = mockMvc.perform(get(MEMBERS_ENDPOINT + "/salary/" + memberSalary.getId()))
-                .andReturn();
-        MembersSalaryDTO member = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MembersSalaryDTO.class);
+        MvcResult mvcResult = mockMvc.perform(
+                get(MEMBERS_ENDPOINT + "/salary/" + memberSalary.getId())).andReturn();
+        MembersSalaryDTO member = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), MembersSalaryDTO.class);
         assertEquals(membersSalaryDTO, member);
 
         mockBackEnd.shutdown();
