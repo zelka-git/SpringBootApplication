@@ -30,19 +30,19 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.modelmapper:modelmapper:2.3.8'
     implementation 'org.hibernate:hibernate-core:5.4.23.Final'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
-    implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.14'
+    implementation "org.springdoc:springdoc-openapi-ui:${openapiVersion}"
+    implementation "org.springdoc:springdoc-openapi-data-rest:${openapiVersion}"
 
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     runtimeOnly 'com.h2database:h2:1.4.200'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.3'
-    testImplementation 'com.squareup.okhttp3:okhttp:4.9.0'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
+    testImplementation "com.squareup.okhttp3:okhttp:${okhttp3Version}"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${okhttp3Version}"
 }
 
 test {
