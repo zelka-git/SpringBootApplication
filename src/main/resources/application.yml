@@ -32,7 +32,7 @@ salary-server:
 
 springdoc:
   swagger-ui:
-    path: /swagger-ui/api-docs.html
+#    path: /swagger-ui/api-docs.html
   model-converters:
     pageable-converter:
       enabled: true

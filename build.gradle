@@ -30,8 +30,8 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.modelmapper:modelmapper:2.3.8'
     implementation 'org.hibernate:hibernate-core:5.4.23.Final'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.5.12'
-    implementation 'org.springdoc:springdoc-openapi-data-rest:1.5.12'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.14'
 
 
     testCompileOnly 'org.projectlombok:lombok:1.18.16'

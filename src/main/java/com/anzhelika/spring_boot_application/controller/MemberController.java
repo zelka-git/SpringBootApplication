@@ -6,6 +6,8 @@ import com.anzhelika.spring_boot_application.service.MemberService;
 import com.anzhelika.spring_boot_application.service.SalaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +46,10 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}")
+    @Operation(summary = "Find by Id", responses = {
+        @ApiResponse(responseCode = "200", description = "success"),
+        @ApiResponse(responseCode = "404", description = "not found", content = @Content)
+    })
     public MemberDTO getMemberById(@PathVariable UUID memberId) {
         return memberService.findById(memberId);
     }
